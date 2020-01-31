@@ -1,0 +1,70 @@
+// find child records of Customer => Invices using relative list
+
+List<rginfo__Apex_Customer__c> customerList2 = [select name,id,(select id,name from Invoices__r) 
+                                        from rginfo__Apex_Customer__c where Name= 'ABC'];
+
+List<rginfo__Apex_Invoice__c> listOfInvoices2=customerList2[0].Invoices__r;
+system.debug('List of Invoices' +listOfInvoices2);
+
+
+
+// find parent records of Invoice => Customer using relative list
+
+
+List<rginfo__Apex_Invoice__c> invoicewithCustomer= new List<rginfo__Apex_Invoice__c>();
+invoicewithCustomer=[select id,name, Apex_Customer__r.name from rginfo__Apex_Invoice__c LIMIT 10];
+ 
+for (rginfo__Apex_Invoice__c objInv:invoicewithCustomer)
+{
+     system.debug('Invoice Customer '+objInv.Apex_Customer__r.name);
+}
+
+
+//Getting AGGREGATE avergage of all the invoices for the ABC Customer
+
+AggregateResult[] groupresults = [select avg(rginfo__Apex_Amount_Paid__c) averageamount 
+                                  from rginfo__Apex_Invoice__c where 
+                                  APEX_Customer__r.name='ABC Customer'];
+
+Object avgPaidAmount=groupresults[0].get('averageamount');
+system.debug('The Average Amount paid by the customer'+avgPaidAmount);
+
+//Getting MAX  of all the invoices for the ABC Customer
+
+AgregateResult[] groupresults= [select MAX(rginfo__Apex_Amount_Paid__c) maxamount from rginfo__Apex_Invoice__c where 
+                                  APEX_Customer__r.name='ABC Customer' ];
+
+Object maxinvoiceAmount=groupresults[0].get('maxamount');
+system.debug('Max Amount' +maxinvoiceAmount);
+
+
+// AGGREGATE function MAX/MIN/AVG
+
+AggregateResult[] groupResults = [select 
+     MAX(rginfo__Apex_Amount_Paid__c) maxamount, 
+     MIN (rginfo__Apex_Amount_Paid__c) minamount,
+     AVG (rginfo__Apex_Amount_Paid__c) avgamount
+     from rginfo__Apex_Invoice__c where 
+     APEX_Customer__r.name='ABC Customer' ];
+
+Object maxinvoiceAmount=groupresults[0].get('maxamount');
+Object minnvoiceAmount=groupresults[0].get('minamount');
+Object avginvoiceAmount=groupresults[0].get('avgamount');
+system.debug('Max Amount' +maxinvoiceAmount+ ' : Min '+minnvoiceAmount+ '  : Avg'+avginvoiceAmount);
+
+// Binding Variables //
+
+String customerName='ABC Customer';
+List<rginfo__Apex_Customer__c> listofCustomer=[select id,name,rginfo__Apex_Customer_Status__c
+                                               from rginfo__Apex_Customer__c where name=:customerName];
+List<rginfo__Apex_Invoice__c> listofinvoices= [select id,rginfo__Apex_Amount_Paid__c 
+                                               from rginfo__Apex_Invoice__c where apex_customer__r.name=:customerName];
+
+    system.debug('List of Customers' +listofCustomer);
+    system.debug('List of Invoices ' +listofinvoices);
+
+
+
+
+
+

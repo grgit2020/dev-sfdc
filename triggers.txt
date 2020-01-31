@@ -1,0 +1,45 @@
+trigger customerTrigger on Apex_Customer__c (after update) {
+
+List<rginfo__Apex_Invoice__c> invoicelist = new List<rginfo__Apex_Invoice__c>();
+
+for ( rginfo__Apex_Customer__c obj_customer:Trigger.new )
+{
+   if (obj_customer.rginfo__Apex_Customer_Status__c=='Active' 
+       && trigger.oldMap.get(obj_customer.id).rginfo__Apex_Customer_Status__c!='Active' )
+       
+       {
+          rginfo__Apex_Invoice__c objInovice = new rginfo__Apex_Invoice__c();
+          
+          objInovice.rginfo__Apex_Status__c='Pending';
+          objInovice.rginfo__Apex_Customer__c=obj_customer.id;
+          objInovice.rginfo__Apex_Description__c='Trigger Created by GR :'+obj_customer.id;
+          invoicelist.add(objInovice); 
+       } 
+}
+
+insert invoicelist;
+}
+
+//////////////////////////////////////////////////////////////
+
+
+trigger myAccountTrigger on Account (before Delete)
+{
+
+if (Trigger.isbefore)
+{
+  if (Trigger.isdelete)
+  {
+    
+   for (account a:Trigger.old)
+   {
+     if(a.Name!='oktodelete')
+     a.adderror('You can not delete this account record');
+   } 
+
+
+  } 
+
+}
+
+}
